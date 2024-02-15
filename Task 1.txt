@@ -1,0 +1,41 @@
+Дана БД, имеющая  две таблицы: сотрудники и подразделение.
+Необходимо написать 4 запроса.
+
+1. Сотрудника с максимальной заработной платой.
+
+SELECT *
+FROM employees
+ORDER BY salary DESC
+LIMIT 1;
+
+2. Вывести одно число: максимальную длину цепочки руководителей по таблице сотрудников (вычислить глубину дерева).
+
+WITH RECURSIVE manager_tree AS(
+SELECT id, cheif_id, name, 0 AS level
+FROM employees
+WHERE cheif_id IS NULL
+
+UNION ALL
+
+SELECT e.id, e.cheif_id, e.name, mt.level + 1
+FROM employees e
+JOIN manager_tree mt ON e.cheif_id = mt.id
+)
+
+SELECT MAX(level) AS max_depth
+FROM manager_tree;
+
+3. Отдел, с максимальной суммарной зарплатой сотрудников. 
+
+SELECT name
+FROM departament d
+JOIN employees e ON d.id = e.departament_id
+GROUP BY name
+ORDER BY SUM(salary) DESC
+LIMIT 1;
+
+4. Сотрудника, чье имя начинается на «Р» и заканчивается на «н».
+
+SELECT *
+FROM employees
+WHERE name LIKE 'Р%н';

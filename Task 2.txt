@@ -1,0 +1,58 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.WriteLine("Please provide the path to the input text file as a command line argument.");
+            return;
+        }
+
+        string inputFilePath = args[0];
+        string outputFilePath = "output_unique_words.txt";
+
+        Dictionary<string, int> wordCount = new Dictionary<string, int>();
+
+        try
+        {
+            string inputText = File.ReadAllText(inputFilePath);
+            string[] words = inputText.Split(new[] { ' ', '\n', '\r', '\t', ',', '.', ';', ':', '?', '!', '-', '(', ')', '[', ']', '{', '}' },
+                                    StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string word in words)
+            {
+                string cleanedWord = word.Trim().ToLower(); 
+                
+                if (wordCount.ContainsKey(cleanedWord))
+                {
+                    wordCount[cleanedWord]++;
+                }
+                else
+                {
+                    wordCount.Add(cleanedWord, 1);
+                }
+            }
+
+            var sortedWordCount = wordCount.OrderByDescending(x => x.Value);
+
+            using (StreamWriter writer = new StreamWriter(outputFilePath))
+            {
+                foreach (var kvp in sortedWordCount)
+                {
+                    writer.WriteLine($"{kvp.Key}\t{kvp.Value}");
+                }
+            }
+
+            Console.WriteLine("Unique words and their counts have been saved to: " + outputFilePath);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An error occurred: " + ex.Message);
+        }
+    }
+}
